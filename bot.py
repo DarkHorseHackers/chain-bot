@@ -5,6 +5,7 @@ import re
 
 import discord
 from dotenv import load_dotenv
+from generate_wordcloud import generate_wordcloud
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -17,6 +18,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+	print(message.content, message.author)
 	if message.author == client.user:
 		return
 
@@ -28,6 +30,24 @@ async def on_message(message):
 		ref_msg = await ref_channel.fetch_message(message_id)
 		msg = "<@!%s> you have been summoned by <@!%s> " % (ref_msg.author.id, message.author.id)
 		await message.channel.send(msg)
+
+	if message.content.startswith("!wordcloud"):
+		print("generating wordcloud for channel %s" % message.channel.name)
+		channel = await client.fetch_channel(message.channel.id)
+		await generate_wordcloud_for_channel(channel)
+
+async def generate_wordcloud_for_channel(channel):	
+	messages = []
+
+	async for message in channel.history(limit=200):
+		if message.author != client.user:
+			messages.append(message.content)
+
+	text = "".join(messages)
+	wordcloud = generate_wordcloud(text)
+	wordcloud.to_file("wordcloud.jpg")
+	with open('wordcloud.jpg', 'rb') as fp:
+		await channel.send(file=discord.File(fp, 'wordcloud.jpg'))
 
 @client.event
 async def on_raw_message_delete(message):
