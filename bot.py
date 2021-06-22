@@ -22,9 +22,9 @@ async def on_message(message):
 	if message.author == client.user:
 		return
 
-	match = re.match(r"https://discordapp\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
+	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
 	if match:
-		guild_id, channel_id, message_id = match[1], match[2], match[3]
+		guild_id, channel_id, message_id = match[2], match[3], match[4]
 		print("detected cross channel reference")
 		ref_channel = await client.fetch_channel(channel_id)
 		ref_msg = await ref_channel.fetch_message(message_id)
