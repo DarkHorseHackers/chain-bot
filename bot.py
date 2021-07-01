@@ -28,7 +28,14 @@ async def on_message(message):
 		print("detected cross channel reference")
 		ref_channel = await client.fetch_channel(channel_id)
 		ref_msg = await ref_channel.fetch_message(message_id)
-		msg = "<@!%s> you have been summoned by <@!%s> " % (ref_msg.author.id, message.author.id)
+                if ref_msg.author.id != message.author.id:
+	    	    msg = "<@!%s> you have been summoned by <@!%s> " % (ref_msg.author.id, message.author.id)
+		    await message.channel.send(msg)
+
+	match = re.match(r".*theory.*", message.content.lower())
+	if match:
+		print("detected theory reference")
+		msg = "<@!%s> do you mean hypothesis?" % (message.author.id)
 		await message.channel.send(msg)
 
 	match = re.match(r".*theory.*", message.content.lower())
