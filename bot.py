@@ -32,16 +32,10 @@ async def on_message(message):
 			msg = "<@!%s> you have been summoned by <@!%s> " % (ref_msg.author.id, message.author.id)
 			await message.channel.send(msg)
 
-	match = re.match(r".*theory.*", message.content.lower())
+	match = re.match(r".*lab leak theory.*", message.content.lower())
 	if match:
 		print("detected theory reference")
-		msg = "<@!%s> do you mean hypothesis?" % (message.author.id)
-		await message.channel.send(msg)
-
-	match = re.match(r".*theory.*", message.content.lower())
-	if match:
-		print("detected theory reference")
-		msg = "<@!%s> do you mean hypothesis?" % (message.author.id)
+		msg = "<@!%s> do you mean lab leak hypothesis?" % (message.author.id)
 		await message.channel.send(msg)
 
 	if message.content.startswith("!wordcloud"):
