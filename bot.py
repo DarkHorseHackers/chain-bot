@@ -93,12 +93,16 @@ async def check_time():
 	print("running check_time")
 	await client.wait_until_ready()
 	print("ready check_time")
-	while not client.is_closed:
+	while not client.is_closed():
 		print("scheduling check_time")
-		s = sched.scheduler(time.perf_counter, time.sleep)
-		args = (update_channel(), )
-		s.enter(60, 1, client.loop.create_task, args)
-		s.run()
+		now = datetime.now()
+		current_time = now.strftime("%H:%M:%S")
+		print("current time is %s" % current_time)
+		channel = await client.fetch_channel("730163671191519342")
+		name = "bot-sandbox (%s)" % current_time
+		await channel.edit(name=name)
+		await channel.send("updated channel name to %s" % name)
+		await asyncio.sleep(5)
 	print("done check_time")
 
 def wait():
