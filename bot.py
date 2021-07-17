@@ -2,6 +2,8 @@
 import os
 import random
 import re
+import threading
+import datetime
 
 import discord
 from dotenv import load_dotenv
@@ -75,4 +77,15 @@ async def on_raw_message_delete(message):
 		user = await client.fetch_user(id)
 		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
 
+async def check_time():
+	threading.Timer(60, check_time).start()
+	now = datetime.now()
+
+	current_time = now.strftime("%H:%M:%S")
+	channel = await client.fetch_channel("730163671191519342")
+	name = "bot-sandbox (%s)" % current_time
+	await channel.edit(name=name)
+	await channel.send("updated channel name to %s" % name)
+
 client.run(TOKEN)
+check_time()
