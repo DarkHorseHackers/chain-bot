@@ -50,6 +50,8 @@ async def on_message(message):
 		msg = "changing channel name <#%s> -> %s" % (message.channel.id, name)
 		await message.channel.send(msg)
 		await message.channel.edit(name=name)
+		msg = "channel name changed to %s" % (message.channel.name)
+		await message.channel.send(msg)
 
 async def generate_wordcloud_for_channel(channel):	
 	messages = []
