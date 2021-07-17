@@ -3,7 +3,7 @@ import os
 import random
 import re
 import threading
-import datetime
+from datetime import datetime
 
 import discord
 from dotenv import load_dotenv
