@@ -4,6 +4,8 @@ import random
 import re
 import threading
 import asyncio
+import time
+import sched
 from datetime import datetime
 
 import discord
@@ -78,10 +80,8 @@ async def on_raw_message_delete(message):
 		user = await client.fetch_user(id)
 		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
 
-async def check_time():
-	threading.Timer(60, wait).start()
+async def update_channel():
 	now = datetime.now()
-
 	current_time = now.strftime("%H:%M:%S")
 	print("current time is %s" % current_time)
 	channel = await client.fetch_channel("730163671191519342")
@@ -89,9 +89,18 @@ async def check_time():
 	await channel.edit(name=name)
 	await channel.send("updated channel name to %s" % name)
 
+async def check_time():
+	await client.wait_until_ready()
+	while not client.is_closed:
+		s = sched.scheduler(time.perf_counter, time.sleep)
+		args = (update_channel(), )
+		s.enter(60, 1, client.loop.create_task, args)
+		s.run()
+
 def wait():
 	print("execute wait")
 	asyncio.run_coroutine_threadsafe(check_time(), asyncio.new_event_loop())
 
+client.loop.create_task(check_time())
+
 client.run(TOKEN)
-wait()
