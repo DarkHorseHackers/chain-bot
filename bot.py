@@ -83,13 +83,15 @@ async def check_time():
 	now = datetime.now()
 
 	current_time = now.strftime("%H:%M:%S")
+	print("current time is %s" % current_time)
 	channel = await client.fetch_channel("730163671191519342")
 	name = "bot-sandbox (%s)" % current_time
 	await channel.edit(name=name)
 	await channel.send("updated channel name to %s" % name)
 
 def wait():
-    asyncio.run(check_time())
+	print("execute wait")
+	asyncio.run_coroutine_threadsafe(check_time(), asyncio.new_event_loop())
 
 client.run(TOKEN)
 wait()
