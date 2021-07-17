@@ -3,6 +3,7 @@ import os
 import random
 import re
 import threading
+import asyncio
 from datetime import datetime
 
 import discord
@@ -78,7 +79,7 @@ async def on_raw_message_delete(message):
 		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
 
 async def check_time():
-	threading.Timer(60, check_time).start()
+	threading.Timer(60, wait).start()
 	now = datetime.now()
 
 	current_time = now.strftime("%H:%M:%S")
@@ -87,5 +88,8 @@ async def check_time():
 	await channel.edit(name=name)
 	await channel.send("updated channel name to %s" % name)
 
+def wait():
+    asyncio.run(check_time())
+
 client.run(TOKEN)
-check_time()
+wait()
