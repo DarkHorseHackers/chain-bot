@@ -80,15 +80,6 @@ async def on_raw_message_delete(message):
 		user = await client.fetch_user(id)
 		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
 
-async def update_channel():
-	now = datetime.now()
-	current_time = now.strftime("%H:%M:%S")
-	print("current time is %s" % current_time)
-	channel = await client.fetch_channel("730163671191519342")
-	name = "bot-sandbox (%s)" % current_time
-	await channel.edit(name=name)
-	await channel.send("updated channel name to %s" % name)
-
 async def check_time():
 	print("running check_time")
 	await client.wait_until_ready()
@@ -96,19 +87,14 @@ async def check_time():
 	while not client.is_closed():
 		try:
 			print("scheduling check_time")
-			now = datetime.now()
-			current_time = now.strftime("%H:%M:%S")
-			print("current time is %s" % current_time)
-			channel = await client.fetch_channel("730163671191519342")
-			name = "bot-sandbox (%s)" % current_time
+			current_time = datetime.now()
+			current_day = datetime.today().weekday()
+			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
+			channel = await client.fetch_channel("776116999520649248") # CHAT OVERFLOW / CAMPFIRE KAROAKE VOICE CHANNEL
+			name = "Campfire Karaoke" if current_day == 6 and 20 <= current_time.hour <= 22 else "Chat Overflow"
 			await channel.edit(name=name)
-			await channel.send("updated channel name to %s" % name)
 			print("updated channel name to %s" % name)
 			await asyncio.sleep(60)
-		# s = sched.scheduler(time.perf_counter, time.sleep)
-		# args = (update_channel(), )
-		# s.enter(60, 1, client.loop.create_task, args)
-		# s.run()
 		except Exception as e:
 			print(e)
 			await asyncio.sleep(60)
