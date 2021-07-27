@@ -21,6 +21,8 @@ client = discord.Client()
 async def on_ready():
 	print("bot ready")
 
+reference_referrer_pairs = [(868965736838729768, 868965736838729768), (868965736838729768, 868965736838729768)]
+
 @client.event
 async def on_message(message):
 	print(message.content, message.author)
@@ -30,12 +32,13 @@ async def on_message(message):
 	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
 	if match:
 		guild_id, channel_id, message_id = match[2], match[3], match[4]
-		print("detected cross channel reference")
-		ref_channel = await client.fetch_channel(channel_id)
-		ref_msg = await ref_channel.fetch_message(message_id)
-		if ref_msg.author.id != message.author.id:
-			msg = "<@!%s> you have been summoned by <@!%s> " % (ref_msg.author.id, message.author.id)
-			await message.channel.send(msg)
+		if (channel_id, message.channel.id) in reference_referrer_pairs:
+			print("detected cross channel reference")
+			ref_channel = await client.fetch_channel(channel_id)
+			ref_msg = await ref_channel.fetch_message(message_id)
+			if ref_msg.author.id != message.author.id:
+				msg = "<@!%s> you have been summoned by <@!%s> " % (ref_msg.author.id, message.author.id)
+				await message.channel.send(msg)
 
 	match = re.match(r".*lab leak theory.*", message.content.lower())
 	if match:
