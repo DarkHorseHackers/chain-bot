@@ -21,7 +21,7 @@ client = discord.Client()
 async def on_ready():
 	print("bot ready")
 
-reference_referrer_pairs = [(868965736838729768, 868965736838729768), (868965736838729768, 868965736838729768)]
+reference_referrer_pairs = [(755811907948118179, 741321254027526195), (726866762523738202, 743540914336694392)]
 
 @client.event
 async def on_message(message):
@@ -32,7 +32,7 @@ async def on_message(message):
 	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
 	if match:
 		guild_id, channel_id, message_id = match[2], match[3], match[4]
-		if (channel_id, message.channel.id) in reference_referrer_pairs:
+		if (int(channel_id), message.channel.id) in reference_referrer_pairs:
 			print("detected cross channel reference")
 			ref_channel = await client.fetch_channel(channel_id)
 			ref_msg = await ref_channel.fetch_message(message_id)
