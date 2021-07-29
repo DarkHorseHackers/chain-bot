@@ -74,14 +74,14 @@ async def generate_wordcloud_for_channel(channel):
 	with open('wordcloud.jpg', 'rb') as fp:
 		await channel.send(file=discord.File(fp, 'wordcloud.jpg'))
 
-@client.event
-async def on_raw_message_delete(message):
-	print("detected raw message delete")
-	print(message)
-	if message.cached_message:
-		id = message.cached_message.author.id
-		user = await client.fetch_user(id)
-		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
+# @client.event
+# async def on_raw_message_delete(message):
+# 	print("detected raw message delete")
+# 	print(message)
+# 	if message.cached_message:
+# 		id = message.cached_message.author.id
+# 		user = await client.fetch_user(id)
+# 		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
 
 async def check_time():
 	print("running check_time")
