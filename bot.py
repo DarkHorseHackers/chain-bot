@@ -7,6 +7,8 @@ import asyncio
 import time
 import sched
 from datetime import datetime
+from pytz import timezone
+import pytz
 
 import discord
 from dotenv import load_dotenv
@@ -90,7 +92,8 @@ async def check_time():
 	while not client.is_closed():
 		try:
 			print("scheduling check_time")
-			current_time = datetime.now()
+			utc_now = pytz.utc.localize(datetime.utcnow())
+			current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
 			current_day = datetime.today().weekday()
 			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
 			channel = await client.fetch_channel("776116999520649248") # CHAT OVERFLOW / CAMPFIRE KAROAKE VOICE CHANNEL
