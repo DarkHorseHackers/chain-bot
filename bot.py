@@ -31,17 +31,35 @@ async def on_message(message):
 	if message.author == client.user:
 		return
 
-	if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
-		match = re.match(r".*Bret and Heather (.*) DarkHorse Podcast Livestream.*", message.content)
+	# if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
+	if message.author.id == 744749168903585854: # PlasmaIntec
+		match = re.match(r".*Bret and Heather (.*) DarkHorse Podcast Livestream.*(https\:\/\/odysee\.com\/.*)", message.content, re.S)
+		print("MATCH: " + match[0])
 		if match:
-			live_stream = match[1]
-			live_stream_number = int("".join(e for e in live_stream if e.isnumeric()))
-			episode_name = "episode-%s" % live_stream_number
+			livestream, livestream_link = match[1], match[2]
+			print("LINK: " + livestream_link)
+			livestream_number = int("".join(e for e in livestream if e.isnumeric()))
+			episode_name = "episode-%s" % livestream_number
 			channel = discord.utils.get(client.get_all_channels(), name=episode_name)
 			category = await client.fetch_channel(800076391156547634) # category: Episode Discussions
 			if not channel:
+				# if channel isn't created yet, create new discussion channel, post livestream link, then pin livestream link
 				new_channel = await message.guild.create_text_channel(episode_name, category=category)
 				print("CREATE CHANNEL: ", new_channel)
+				message = await new_channel.send(livestream_link)
+				print(message)
+				await message.pin(reason="livestream link")
+				
+			# archive old channels in episode discussions category		
+			episode_discussions_id = 800076391156547634 # episode discussions category
+			episode_discussions_channel = await client.fetch_channel(episode_discussions_id)
+			archive_id = 810266760934326332 # podcast archives category
+			archive_channel = await client.fetch_channel(archive_id)
+
+			for channel in episode_discussions_channel.channels:
+				if channel.name.startswith("episode-") and (datetime.utcnow()-channel.created_at).days > 14:
+					print("ARCHIVING CHANNEL: " + channel.name)
+					await channel.edit(category=archive_channel)
 
 	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
 	if match:
