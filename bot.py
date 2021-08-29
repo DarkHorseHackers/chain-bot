@@ -56,7 +56,7 @@ async def on_message(message):
 			archive_channel = await client.fetch_channel(archive_id)
 
 			for channel in episode_discussions_channel.channels:
-				if channel.name.startswith("episode-") and (datetime.utcnow()-channel.created_at).days > 14:
+				if channel.name.startswith("episode-") and (datetime.utcnow()-channel.created_at).days > 13:
 					print("ARCHIVING CHANNEL: " + channel.name)
 					await channel.edit(category=archive_channel)
 
