@@ -31,8 +31,7 @@ async def on_message(message):
 	if message.author == client.user:
 		return
 
-	# if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
-	if message.author.id == 744749168903585854: # PlasmaIntec
+	if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
 		match = re.match(r".*Bret and Heather (.*) DarkHorse Podcast Livestream.*(https\:\/\/odysee\.com\/.*)", message.content, re.S)
 		print("MATCH: " + match[0])
 		if match:
