@@ -40,7 +40,8 @@ async def on_message(message):
 			livestream_number = int("".join(e for e in livestream if e.isnumeric()))
 			episode_name = "episode-%s" % livestream_number
 			channel = discord.utils.get(client.get_all_channels(), name=episode_name)
-			category = await client.fetch_channel(800076391156547634) # category: Episode Discussions
+			darkhorse_podcast_category_id = 833086830521483324
+			category = await client.fetch_channel(darkhorse_podcast_category_id)
 			if not channel:
 				# if channel isn't created yet, create new discussion channel, post livestream link, then pin livestream link
 				new_channel = await message.guild.create_text_channel(episode_name, category=category)
@@ -49,9 +50,8 @@ async def on_message(message):
 				print(message)
 				await message.pin(reason="livestream link")
 				
-			# archive old channels in episode discussions category		
-			episode_discussions_id = 800076391156547634 # episode discussions category
-			episode_discussions_channel = await client.fetch_channel(episode_discussions_id)
+			# archive old channels in episode discussions category
+			episode_discussions_channel = await client.fetch_channel(darkhorse_podcast_category_id)
 			archive_id = 810266760934326332 # podcast archives category
 			archive_channel = await client.fetch_channel(archive_id)
 
@@ -125,8 +125,8 @@ async def check_time():
 			current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
 			current_day = datetime.today().weekday()
 			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
-			channel = await client.fetch_channel("776116999520649248") # CHAT OVERFLOW / CAMPFIRE KAROAKE VOICE CHANNEL
-			name = "Campfire Karaoke" if current_day == 0 and ((current_time.hour == 19 and current_time.minute >= 45) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)) else "Chat Overflow"
+			channel = await client.fetch_channel("833087155546620005") # LOUNGE TWO / CAMPFIRE KAROAKE VOICE CHANNEL
+			name = "Campfire Karaoke" if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 45) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)) else "Lounge Two" # between 4:45 and 7:15 PST
 			await channel.edit(name=name)
 			print("updated channel name to %s" % name)
 			await asyncio.sleep(60)
