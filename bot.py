@@ -105,15 +105,6 @@ async def generate_wordcloud_for_channel(channel):
 	with open('wordcloud.jpg', 'rb') as fp:
 		await channel.send(file=discord.File(fp, 'wordcloud.jpg'))
 
-# @client.event
-# async def on_raw_message_delete(message):
-# 	print("detected raw message delete")
-# 	print(message)
-# 	if message.cached_message:
-# 		id = message.cached_message.author.id
-# 		user = await client.fetch_user(id)
-# 		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
-
 async def check_time():
 	print("running check_time")
 	await client.wait_until_ready()
@@ -125,11 +116,16 @@ async def check_time():
 			current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
 			current_day = datetime.today().weekday()
 			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
-			channel = await client.fetch_channel("833087155546620005") # LOUNGE TWO / CAMPFIRE KAROAKE VOICE CHANNEL
-			name = "Campfire Karaoke" if current_day == 0 and ((current_time.hour == 19 and current_time.minute >= 45) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)) else "Lounge Two" # between 4:45 and 7:15 PST
-			# NOTE: checking current_day == 0 due to EC2 timezone
-			await channel.edit(name=name)
-			print("updated channel name to %s" % name)
+			lounge_one_channel = await client.fetch_channel("833087132414771310") # LOUNGE ONE VOICE CHANNEL
+			lounge_two_channel = await client.fetch_channel("833087155546620005") # LOUNGE TWO / CAMPFIRE KAROAKE VOICE CHANNEL
+			if current_time.hour == 0: # reset channel names each day at midnight
+				await lounge_one_channel.edit(name="Lounge One")
+				await lounge_two_channel.edit(name="Lounge Two")
+				print("updated lounge channel names at midnight")
+			if current_day == 0 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
+				# NOTE: checking current_day == 0 due to EC2 timezone
+				await lounge_two_channel.edit(name="Campfire Karaoke")
+				print("updated Lounge Two channel name to Campfire Karaoke")
 			await asyncio.sleep(60)
 		except Exception as e:
 			print(e)
