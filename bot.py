@@ -58,7 +58,7 @@ async def on_message(message):
 			for channel in episode_discussions_channel.channels:
 				if channel.name.startswith("episode-") and (datetime.utcnow()-channel.created_at).days > 13:
 					print("ARCHIVING CHANNEL: " + channel.name)
-					await channel.edit(category=archive_channel)
+					await channel.edit(category=archive_channel, sync_permissions=True)
 
 	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
 	if match:
