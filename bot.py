@@ -118,9 +118,11 @@ async def check_time():
 			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
 			lounge_one_channel = await client.fetch_channel("833087132414771310") # LOUNGE ONE VOICE CHANNEL
 			lounge_two_channel = await client.fetch_channel("833087155546620005") # LOUNGE TWO / CAMPFIRE KAROAKE VOICE CHANNEL
+			seminar_room_channel = await client.fetch_channel("838114202979532830") # SEMINAR ROOM VOICE CHANNEL
 			if current_time.hour == 0: # reset channel names each day at midnight
 				await lounge_one_channel.edit(name="Lounge One")
 				await lounge_two_channel.edit(name="Lounge Two")
+				await seminar_room_channel.edit(name="Seminar Room")
 				print("updated lounge channel names at midnight")
 			if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
 				await lounge_two_channel.edit(name="Campfire Karaoke")
