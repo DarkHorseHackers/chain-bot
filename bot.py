@@ -121,19 +121,21 @@ async def check_time():
 	while not client.is_closed():
 		try:
 			print("scheduling check_time")
-			utc_now = pytz.utc.localize(datetime.utcnow())
-			current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
-			current_day = datetime.today().weekday()
-			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
-			channel = await client.fetch_channel("776116999520649248") # CHAT OVERFLOW / CAMPFIRE KAROAKE VOICE CHANNEL
-			name = "Campfire Karaoke" if current_day == 0 and ((current_time.hour == 19 and current_time.minute >= 45) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)) else "Chat Overflow"
-			await channel.edit(name=name)
-			print("updated channel name to %s" % name)
 			await asyncio.sleep(60)
 		except Exception as e:
 			print(e)
 			await asyncio.sleep(60)
 	print("done check_time")
+
+async def rename_karoke():
+	utc_now = pytz.utc.localize(datetime.utcnow())
+	current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
+	current_day = datetime.today().weekday()
+	print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
+	channel = await client.fetch_channel("776116999520649248") # CHAT OVERFLOW / CAMPFIRE KAROAKE VOICE CHANNEL
+	name = "Campfire Karaoke" if current_day == 0 and ((current_time.hour == 19 and current_time.minute >= 45) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)) else "Chat Overflow"
+	await channel.edit(name=name)
+	print("updated channel name to %s" % name)
 
 def wait():
 	print("execute wait")
