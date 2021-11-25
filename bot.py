@@ -40,7 +40,8 @@ async def on_message(message):
 			livestream_number = int("".join(e for e in livestream if e.isnumeric()))
 			episode_name = "episode-%s" % livestream_number
 			channel = discord.utils.get(client.get_all_channels(), name=episode_name)
-			category = await client.fetch_channel(800076391156547634) # category: Episode Discussions
+			darkhorse_podcast_category_id = 833086830521483324
+			category = await client.fetch_channel(darkhorse_podcast_category_id)
 			if not channel:
 				# if channel isn't created yet, create new discussion channel, post livestream link, then pin livestream link
 				new_channel = await message.guild.create_text_channel(episode_name, category=category)
@@ -49,16 +50,15 @@ async def on_message(message):
 				print(message)
 				await message.pin(reason="livestream link")
 				
-			# archive old channels in episode discussions category		
-			episode_discussions_id = 800076391156547634 # episode discussions category
-			episode_discussions_channel = await client.fetch_channel(episode_discussions_id)
+			# archive old channels in episode discussions category
+			episode_discussions_channel = await client.fetch_channel(darkhorse_podcast_category_id)
 			archive_id = 810266760934326332 # podcast archives category
 			archive_channel = await client.fetch_channel(archive_id)
 
 			for channel in episode_discussions_channel.channels:
 				if channel.name.startswith("episode-") and (datetime.utcnow()-channel.created_at).days > 13:
 					print("ARCHIVING CHANNEL: " + channel.name)
-					await channel.edit(category=archive_channel)
+					await channel.edit(category=archive_channel, sync_permissions=True)
 
 	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
 	if match:
@@ -105,15 +105,6 @@ async def generate_wordcloud_for_channel(channel):
 	with open('wordcloud.jpg', 'rb') as fp:
 		await channel.send(file=discord.File(fp, 'wordcloud.jpg'))
 
-# @client.event
-# async def on_raw_message_delete(message):
-# 	print("detected raw message delete")
-# 	print(message)
-# 	if message.cached_message:
-# 		id = message.cached_message.author.id
-# 		user = await client.fetch_user(id)
-# 		await user.send("beep boop: your message in the <#%s> channel was deleted" % message.channel_id)
-
 async def check_time():
 	print("running check_time")
 	await client.wait_until_ready()
@@ -121,21 +112,26 @@ async def check_time():
 	while not client.is_closed():
 		try:
 			print("scheduling check_time")
+			utc_now = pytz.utc.localize(datetime.utcnow())
+			current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
+			current_day = datetime.today().weekday()
+			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
+			lounge_one_channel = await client.fetch_channel("833087132414771310") # LOUNGE ONE VOICE CHANNEL
+			lounge_two_channel = await client.fetch_channel("833087155546620005") # LOUNGE TWO / CAMPFIRE KAROAKE VOICE CHANNEL
+			seminar_room_channel = await client.fetch_channel("838114202979532830") # SEMINAR ROOM VOICE CHANNEL
+			if current_time.hour == 0: # reset channel names each day at midnight
+				await lounge_one_channel.edit(name="Lounge One")
+				await lounge_two_channel.edit(name="Lounge Two")
+				await seminar_room_channel.edit(name="Seminar Room")
+				print("updated lounge channel names at midnight")
+			# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
+			# 	await lounge_two_channel.edit(name="Campfire Karaoke")
+			# 	print("updated Lounge Two channel name to Campfire Karaoke")
 			await asyncio.sleep(60)
 		except Exception as e:
 			print(e)
 			await asyncio.sleep(60)
 	print("done check_time")
-
-async def rename_karoke():
-	utc_now = pytz.utc.localize(datetime.utcnow())
-	current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
-	current_day = datetime.today().weekday()
-	print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
-	channel = await client.fetch_channel("776116999520649248") # CHAT OVERFLOW / CAMPFIRE KAROAKE VOICE CHANNEL
-	name = "Campfire Karaoke" if current_day == 0 and ((current_time.hour == 19 and current_time.minute >= 45) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)) else "Chat Overflow"
-	await channel.edit(name=name)
-	print("updated channel name to %s" % name)
 
 def wait():
 	print("execute wait")
