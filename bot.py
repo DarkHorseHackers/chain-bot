@@ -134,7 +134,7 @@ async def check_time():
 					channel = await client.fetch_channel(id)
 					await channel.edit(name=name)
 				print("updated lounge channel names at midnight")
-			# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST (fallback daylight light savings = +1)
+			# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
 			# 	await lounge_two_channel.edit(name="Campfire Karaoke")
 			# 	print("updated Lounge Two channel name to Campfire Karaoke")
 			await asyncio.sleep(60)
