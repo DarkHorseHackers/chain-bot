@@ -25,6 +25,12 @@ async def on_ready():
 
 reference_referrer_pairs = [(755811907948118179, 741321254027526195), (726866762523738202, 743540914336694392)]
 
+async def archive_channel_to_archive(channel_id, archive_id):
+	old_channel = await client.fetch_channel(channel_id)
+	archive_channel = await client.fetch_channel(archive_id)
+	print("ARCHIVING CHANNEL: " + old_channel.name)
+	old_channel.edit(category=archive_channel, sync_permissions=True) # requires Manage Channel + Manage Permissions permissions
+
 @client.event
 async def on_message(message):
 	print(message.content, message.author)
@@ -116,17 +122,21 @@ async def check_time():
 			current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
 			current_day = datetime.today().weekday()
 			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
-			lounge_one_channel = await client.fetch_channel("833087132414771310") # LOUNGE ONE VOICE CHANNEL
-			lounge_two_channel = await client.fetch_channel("833087155546620005") # LOUNGE TWO / CAMPFIRE KAROAKE VOICE CHANNEL
-			seminar_room_channel = await client.fetch_channel("838114202979532830") # SEMINAR ROOM VOICE CHANNEL
+			reset_channel_ids_and_names = [
+				["833087132414771310", "Lounge One"],
+				["732987976317009922", "lounge-one-text"],
+				["833087155546620005", "Lounge Two"],
+				["804431468662358057", "lounge-two-text"],
+				["838114202979532830", "Seminar Room"],
+			]
 			if current_time.hour == 0: # reset channel names each day at midnight
-				await lounge_one_channel.edit(name="Lounge One")
-				await lounge_two_channel.edit(name="Lounge Two")
-				await seminar_room_channel.edit(name="Seminar Room")
+				for id, name in reset_channel_ids_and_names:
+					channel = await client.fetch_channel(id)
+					await channel.edit(name=name)
 				print("updated lounge channel names at midnight")
-			if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
-				await lounge_two_channel.edit(name="Campfire Karaoke")
-				print("updated Lounge Two channel name to Campfire Karaoke")
+			# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST (fallback daylight light savings = +1)
+			# 	await lounge_two_channel.edit(name="Campfire Karaoke")
+			# 	print("updated Lounge Two channel name to Campfire Karaoke")
 			await asyncio.sleep(60)
 		except Exception as e:
 			print(e)
