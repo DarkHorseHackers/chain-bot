@@ -36,6 +36,36 @@ async def on_message(message):
 	print(message.content, message.author)
 	if message.author == client.user:
 		return
+		
+	if any(role.name == 'Organizer' or role.name == 'Moderator' for role in message.author.roles): # whitelist moderator and organizer roles
+		pass
+	elif message.type == discord.MessageType.thread_created: # don't kill system messages (which actually contain user content) created upon thread creation
+		pass
+	else:
+		print(message.type)
+		# rules: [rule lambda, message to send violator]
+		contains_hyperlink = [lambda m: re.match(r".*https://.*", m, re.S), "contains hyperlink"]
+		content_too_long = [lambda m: len(m.split(" ")) > 1, "content too long"]
+		does_not_contain_bold_text = [lambda m: not re.match(r".*\*\*.*\*\*.*", m, re.S), "does not contain bold text"]
+		does_not_contain_hyperlink = [lambda m: not re.match(r".*https://.*", m, re.S), "does not contain hyperlink"]
+
+		# [list of rule, channel id using these rules]
+		all_rules = [
+			[[contains_hyperlink, content_too_long], 730163671191519342],
+			[[does_not_contain_hyperlink], 730163671191519342]
+		]
+
+		did_violate = False
+		violations = []
+		for rules, rule_channel_id in all_rules:
+			if message.channel.id == rule_channel_id:
+				for rule_lambda, violation_message in rules:
+					if rule_lambda(message.content):
+						violations.append(violation_message)
+						did_violate = True
+		if did_violate:
+			await message.delete()
+			await message.author.send("Booooop! Your message in <#%s> was deleted for the following violations:\n" % message.channel.id + "\n".join("**"+v+"**" for v in violations))
 
 	if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
 		match = re.match(r".*Bret and Heather (.*) DarkHorse Podcast Livestream.*(https\:\/\/odysee\.com\/.*)", message.content, re.S)
