@@ -25,12 +25,6 @@ async def on_ready():
 
 reference_referrer_pairs = [(755811907948118179, 741321254027526195), (726866762523738202, 743540914336694392)]
 
-async def archive_channel_to_archive(channel_id, archive_id):
-	old_channel = await client.fetch_channel(channel_id)
-	archive_channel = await client.fetch_channel(archive_id)
-	print("ARCHIVING CHANNEL: " + old_channel.name)
-	old_channel.edit(category=archive_channel, sync_permissions=True) # requires Manage Channel + Manage Permissions permissions
-
 @client.event
 async def on_message(message):
 	print(message.content, message.author)
@@ -85,16 +79,6 @@ async def on_message(message):
 				message = await new_channel.send(livestream_link)
 				print(message)
 				await message.pin(reason="livestream link")
-				
-			# archive old channels in episode discussions category
-			episode_discussions_channel = await client.fetch_channel(darkhorse_podcast_category_id)
-			archive_id = 810266760934326332 # podcast archives category
-			archive_channel = await client.fetch_channel(archive_id)
-
-			for channel in episode_discussions_channel.channels:
-				if channel.name.startswith("episode-") and (datetime.utcnow()-channel.created_at).days > 13:
-					print("ARCHIVING CHANNEL: " + channel.name)
-					await channel.edit(category=archive_channel, sync_permissions=True)
 
 	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
 	if match:
@@ -141,6 +125,42 @@ async def generate_wordcloud_for_channel(channel):
 	with open('wordcloud.jpg', 'rb') as fp:
 		await channel.send(file=discord.File(fp, 'wordcloud.jpg'))
 
+async def archive_channel_to_archive(channel_id, archive_id):
+	old_channel = await client.fetch_channel(channel_id)
+	archive_channel = await client.fetch_channel(archive_id)
+	print("ARCHIVING CHANNEL: " + old_channel.name)
+	await old_channel.edit(category=archive_channel, sync_permissions=True) # requires Manage Channel + Manage Permissions permissions
+
+async def archive_old_podcasts():
+	# archive old channels in episode discussions category
+	category_id = 833086830521483324 # darkhorse podcast category id
+	archive_id = 810266760934326332 # podcast archives category
+	episode_discussions_channel = await client.fetch_channel(category_id)
+
+	for channel in episode_discussions_channel.channels:
+		if channel.name.startswith("episode-") and (datetime.now(pytz.utc)-channel.created_at).days > 13:
+			await archive_channel_to_archive(channel.id, archive_id)
+
+async def update_channel_names():
+	current_time = datetime.now(pytz.utc)
+	current_day = datetime.today().weekday()
+	print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
+	reset_channel_ids_and_names = [
+		["833087132414771310", "Lounge One"],
+		["732987976317009922", "lounge-one-text"],
+		["833087155546620005", "Lounge Two"],
+		["804431468662358057", "lounge-two-text"],
+		["838114202979532830", "Seminar Room"],
+	]
+	if current_time.hour == 0: # reset channel names each day at midnight
+		for id, name in reset_channel_ids_and_names:
+			channel = await client.fetch_channel(id)
+			await channel.edit(name=name)
+		print("updated lounge channel names at midnight")
+	# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
+	# 	await lounge_two_channel.edit(name="Campfire Karaoke")
+	# 	print("updated Lounge Two channel name to Campfire Karaoke")
+
 async def check_time():
 	print("running check_time")
 	await client.wait_until_ready()
@@ -148,25 +168,11 @@ async def check_time():
 	while not client.is_closed():
 		try:
 			print("scheduling check_time")
-			utc_now = pytz.utc.localize(datetime.utcnow())
-			current_time = utc_now.astimezone(pytz.timezone("US/Eastern"))
-			current_day = datetime.today().weekday()
-			print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
-			reset_channel_ids_and_names = [
-				["833087132414771310", "Lounge One"],
-				["732987976317009922", "lounge-one-text"],
-				["833087155546620005", "Lounge Two"],
-				["804431468662358057", "lounge-two-text"],
-				["838114202979532830", "Seminar Room"],
-			]
-			if current_time.hour == 0: # reset channel names each day at midnight
-				for id, name in reset_channel_ids_and_names:
-					channel = await client.fetch_channel(id)
-					await channel.edit(name=name)
-				print("updated lounge channel names at midnight")
-			# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
-			# 	await lounge_two_channel.edit(name="Campfire Karaoke")
-			# 	print("updated Lounge Two channel name to Campfire Karaoke")
+
+			await update_channel_names()
+
+			await archive_old_podcasts()
+
 			await asyncio.sleep(60)
 		except Exception as e:
 			print(e)
