@@ -52,7 +52,7 @@ async def on_message(message):
 
 		# [list of rule, channel id using these rules]
 		all_rules = [
-			[[contains_hyperlink, content_too_long], question_submission_channel_id],
+			# [[contains_hyperlink, content_too_long], question_submission_channel_id],
 		]
 
 		did_violate = False
