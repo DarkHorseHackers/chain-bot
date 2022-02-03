@@ -52,7 +52,7 @@ async def on_message(message):
 
 		# [list of rule, channel id using these rules]
 		all_rules = [
-			# [[contains_hyperlink, content_too_long], question_submission_channel_id],
+			[[contains_hyperlink, content_too_long], question_submission_channel_id],
 		]
 
 		did_violate = False
@@ -70,7 +70,9 @@ async def on_message(message):
 			await message.author.send(
 				"Booooop! Your message in <#%s> was deleted for the following violations:\n\n" % message.channel.id + 
 				"\n".join(v + "\n" + h for v, h in zip(("**"+v+"**" for v in violations), ("*"+h+"*" if h else "" for h in hints))) +
-				"\n\nPlease resubmit your entry!"
+				"\n\nPlease resubmit your entry!" +
+				"\n\nHere is your original entry:\n\n" +
+				message.content
 			)
 
 	if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
