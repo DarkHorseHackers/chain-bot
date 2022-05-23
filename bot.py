@@ -166,7 +166,7 @@ async def update_channel_names():
 		["804431468662358057", "lounge-two-text"],
 		["838114202979532830", "Seminar Room"],
 	]
-	if current_time.hour == 0: # reset channel names each day at midnight
+	if current_time.hour == 5: # reset channel names each day at midnight
 		for id, name in reset_channel_ids_and_names:
 			channel = await client.fetch_channel(id)
 			await channel.edit(name=name)
