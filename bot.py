@@ -148,7 +148,7 @@ async def archive_channel_to_archive(channel_id, archive_id):
 async def archive_old_podcasts():
 	# archive old channels in episode discussions category
 	category_id = 833086830521483324 # darkhorse podcast category id
-	archive_id = 810266760934326332 # podcast archives category
+	archive_id = 977024766387028008 # podcast archives category
 	episode_discussions_channel = await client.fetch_channel(category_id)
 
 	for channel in episode_discussions_channel.channels:
