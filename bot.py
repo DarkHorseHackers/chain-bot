@@ -25,7 +25,7 @@ async def on_ready():
 
 reference_referrer_pairs = [(755811907948118179, 741321254027526195), (726866762523738202, 743540914336694392)]
 
-QUESTION_SUBMISSION_LIMIT = 50
+QUESTION_SUBMISSION_LIMIT = 65
 bot_sandbox_channel_id = 730163671191519342
 question_submission_channel_id = 755811907948118179
 question_chat_channel_id = 741321254027526195
@@ -50,9 +50,11 @@ async def on_message(message):
 		does_not_contain_bold_text = [lambda m: not re.match(r".*\*\*.*\*\*.*", m, re.S), "does not contain bold text", ""]
 		does_not_contain_hyperlink = [lambda m: not re.match(r".*https://.*", m, re.S), "does not contain hyperlink", ""]
 
+		pinned_rules_message_link = "https://discord.com/channels/726864220838297610/755811907948118179/856650060100403211"
+
 		# [list of rule, channel id using these rules]
 		all_rules = [
-			# [[contains_hyperlink, content_too_long], question_submission_channel_id],
+			[[contains_hyperlink, content_too_long], question_submission_channel_id],
 		]
 
 		did_violate = False
@@ -70,6 +72,7 @@ async def on_message(message):
 			await message.author.send(
 				"Booooop! Your message in <#%s> was deleted for the following violations:\n\n" % message.channel.id + 
 				"\n".join(v + "\n" + h for v, h in zip(("**"+v+"**" for v in violations), ("*"+h+"*" if h else "" for h in hints))) +
+				"\n\nPlease check the pinned rules: " + pinned_rules_message_link +
 				"\n\nPlease resubmit your entry!" +
 				"\n\nHere is your original entry:\n\n" +
 				message.content
