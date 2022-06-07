@@ -50,7 +50,7 @@ async def on_message(message):
 		does_not_contain_bold_text = [lambda m: not re.match(r".*\*\*.*\*\*.*", m, re.S), "does not contain bold text", ""]
 		does_not_contain_hyperlink = [lambda m: not re.match(r".*https://.*", m, re.S), "does not contain hyperlink", ""]
 
-		pinned_rules_message_link = "https://discord.com/channels/726864220838297610/755811907948118179/856650060100403211"
+		pinned_rules_message_link = "https://discord.com/channels/726864220838297610/755811907948118179/983562041786789898"
 
 		# [list of rule, channel id using these rules]
 		all_rules = [
