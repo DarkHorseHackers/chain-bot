@@ -45,7 +45,7 @@ async def on_message(message):
 	else:
 		print(message.type)
 		# rules: [rule lambda, message to send violator, hint]
-		contains_hyperlink = [lambda m: re.match(r".*https://.*", m, re.S), "contains hyperlink", "links can be shared in <#%s>" % question_chat_channel_id]
+		contains_hyperlink = [lambda m: re.match(r".*https://.*", m, re.S), "contains hyperlink", ""]
 		content_too_long = [lambda m: len(m.split(" ")) > QUESTION_SUBMISSION_LIMIT, "content too long", ""]
 		does_not_contain_bold_text = [lambda m: not re.match(r".*\*\*.*\*\*.*", m, re.S), "does not contain bold text", ""]
 		does_not_contain_hyperlink = [lambda m: not re.match(r".*https://.*", m, re.S), "does not contain hyperlink", ""]
