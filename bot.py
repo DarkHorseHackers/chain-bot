@@ -75,7 +75,9 @@ async def on_message(message):
 				"\n\nPlease check the pinned rules: " + pinned_rules_message_link +
 				"\n\nPlease resubmit your entry!" +
 				"\n\nHere is your original entry:\n\n" +
-				message.content
+				"```" + 
+				message.content +
+				"```" 
 			)
 
 	if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
