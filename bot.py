@@ -72,7 +72,7 @@ async def on_message(message):
 			question_chat_channel = await client.fetch_channel(question_chat_channel_id)
 			bot_noise = random.choice(["*mechanical wail~~*", "Booooop", "Boink", "BeepBeep", "Blarmo!"])
 			await question_chat_channel.send(
-				"Booooop <@!%s>! Your message in <#%s> was deleted for the following violations:\n\n" % (bot_noise, message.author.id, message.channel.id) + 
+				"%s <@!%s>! Your message in <#%s> was deleted for the following violations:\n\n" % (bot_noise, message.author.id, message.channel.id) + 
 				"\n".join(v + "\n" + h for v, h in zip(("**"+v+"**" for v in violations), ("*"+h+"*" if h else "" for h in hints))) +
 				"\n\nPlease check the pinned rules: " + pinned_rules_message_link +
 				"\n\nPlease resubmit your entry!" +
