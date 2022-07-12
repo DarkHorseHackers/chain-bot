@@ -25,7 +25,7 @@ async def on_ready():
 
 reference_referrer_pairs = [(755811907948118179, 741321254027526195), (726866762523738202, 743540914336694392)]
 
-QUESTION_SUBMISSION_LIMIT = 50
+QUESTION_SUBMISSION_LIMIT = 65
 bot_sandbox_channel_id = 730163671191519342
 question_submission_channel_id = 755811907948118179
 question_chat_channel_id = 741321254027526195
