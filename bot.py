@@ -133,6 +133,12 @@ async def on_message(message):
 		msg = "channel name changed to %s" % (message.channel.name)
 		await message.channel.send(msg)
 
+	match = re.match(r"!brian (.*)", message.content.lower())
+	if match:
+		name = match[1]
+		print("detected brian")
+		await message.edit(message="@")
+
 async def generate_wordcloud_for_channel(channel):	
 	messages = []
 
