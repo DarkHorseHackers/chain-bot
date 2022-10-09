@@ -13,11 +13,14 @@ import pytz
 import discord
 from dotenv import load_dotenv
 from generate_wordcloud import generate_wordcloud
+from generate_meme import generate_meme
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client()
+intents = discord.Intents.default()
+intents.message_content = True
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
@@ -39,8 +42,6 @@ async def on_message(message):
 	# NOTE: to install discord.py 2.0, use 
 	# pip install git+https://github.com/Rapptz/discord.py
 	if any(role.name == 'Organizer' or role.name == 'Moderator' for role in message.author.roles): # whitelist moderator and organizer roles
-		pass
-	elif message.type == discord.MessageType.thread_created: # don't kill system messages (which actually contain user content) created upon thread creation
 		pass
 	else:
 		print(message.type)
@@ -135,9 +136,19 @@ async def on_message(message):
 
 	match = re.match(r"!brian (.*)", message.content.lower())
 	if match:
-		name = match[1]
-		print("detected brian")
-		await message.edit(message="@")
+		text = match[1]
+		print("detected brian, %s" % text)
+		brian_text = "@".join(text.split(" "))
+		print("text: ", brian_text)
+		await message.channel.send(brian_text)
+
+	match = re.match(r"!couple (.*)", message.content.lower())
+	if match:
+		text = match[1]
+		print("detected couple, %s" % text)
+		generate_meme(text)
+		with open('meme.jpg', 'rb') as fp:
+			await message.channel.send(file=discord.File(fp, 'meme.jpg'))
 
 async def generate_wordcloud_for_channel(channel):	
 	messages = []
@@ -190,7 +201,7 @@ async def update_channel_names():
 
 async def check_time():
 	print("running check_time")
-	await client.wait_until_ready()
+	# await client.wait_until_ready()
 	print("ready check_time")
 	while not client.is_closed():
 		try:
@@ -210,6 +221,18 @@ def wait():
 	print("execute wait")
 	asyncio.run_coroutine_threadsafe(check_time(), asyncio.new_event_loop())
 
-client.loop.create_task(check_time())
+# client.loop.create_task(check_time())
 
-client.run(TOKEN)
+async def main():
+	# do other async things	
+	await client.login(token=TOKEN)
+	# await check_time()
+
+    # start the client
+	async with client:
+		print("starting client")
+		await client.start(TOKEN)
+
+asyncio.run(main())
+
+# client.run(TOKEN)
