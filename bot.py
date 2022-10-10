@@ -232,7 +232,7 @@ async def archive_old_podcasts():
 	episode_discussions_channel = await client.fetch_channel(category_id)
 
 	for channel in episode_discussions_channel.channels:
-		if channel.name.startswith("episode-") and (datetime.now(pytz.utc)-channel.created_at).days > 13:
+		if channel.name.startswith("episode-") and (datetime.now(pytz.utc)-channel.created_at).days > 13 and not channel.name == "episode-discussions":
 			await archive_channel_to_archive(channel.id, archive_id)
 
 async def update_channel_names():
@@ -279,10 +279,19 @@ def wait():
 
 # client.loop.create_task(check_time())
 
+def between_callback():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(check_time())
+    loop.close()
+
 async def main():
-	# do other async things	
 	await client.login(token=TOKEN)
-	# await check_time()
+
+	# do other async things	
+	thread = threading.Thread(target=between_callback)
+	thread.start()
 
     # start the client
 	async with client:
