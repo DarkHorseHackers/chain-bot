@@ -40,8 +40,6 @@ question_chat_channel_id = 741321254027526195
 
 @client.event
 async def on_message(message):
-	if message.author.id != 744749168903585854:
-		return
 	print(message.content, message.author)
 	if message.author == client.user:
 		return
