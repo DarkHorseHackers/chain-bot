@@ -125,9 +125,21 @@ async def on_message(message):
 		await message.channel.send(msg)
 
 	if message.content.startswith("!wordcloud"):
-		print("generating wordcloud for channel %s" % message.channel.name)
-		channel = await client.fetch_channel(message.channel.id)
-		await generate_wordcloud_for_channel(channel)
+		try:
+			channel = await client.fetch_channel(message.channel.id)
+			print("generating wordcloud for channel %s" % message.channel.name)
+			match = re.match(r"!wordcloud (.*)", message.content.lower())
+			if match:
+				text = match[1]
+				parser = argparse.ArgumentParser(description='Process wordcloud arguments.')
+				parser.add_argument('--limit', type=int)
+				args = vars(parser.parse_args(shlex.split(text)))
+				print("wordcloud args: ", args)
+				await generate_wordcloud_for_channel(channel, args["limit"])
+			else:
+				await generate_wordcloud_for_channel(channel)
+		except Exception as e:
+			print("Exception: ", e)
 
 	match = re.match(r"!name (.*)", message.content.lower())
 	if match:
