@@ -1,4 +1,3 @@
-# bot.py
 import os
 import random
 import re
@@ -9,15 +8,22 @@ import sched
 from datetime import datetime
 from pytz import timezone
 import pytz
-
-import discord
-from dotenv import load_dotenv
-from generate_wordcloud import generate_wordcloud
-from generate_meme import generate_meme
 import requests
 import argparse
 import shlex
 import shutil
+import discord
+from dotenv import load_dotenv
+
+from functions.detect_lab_leak import detect_lab_leak
+from functions.detect_cross_channel import detect_cross_channel
+from functions.detect_wordcloud import detect_wordcloud
+from functions.detect_couple import detect_couple
+from functions.detect_brian import detect_brian
+from functions.detect_name import detect_name
+from functions.detect_violations import detect_violations
+from functions.detect_new_ep import detect_new_ep
+from functions.do_background_tasks import do_background_tasks
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -27,281 +33,40 @@ intents.message_content = True
 intents.guilds = True
 client = discord.Client(intents=intents)
 
+# NOTE: to install discord.py 2.0, use 
+# pip install git+https://github.com/Rapptz/discord.py
+
 @client.event
 async def on_ready():
 	print("bot ready")
-
-reference_referrer_pairs = [(755811907948118179, 741321254027526195), (726866762523738202, 743540914336694392)]
-
-QUESTION_SUBMISSION_LIMIT = 65
-bot_sandbox_channel_id = 730163671191519342
-question_submission_channel_id = 755811907948118179
-question_chat_channel_id = 741321254027526195
 
 @client.event
 async def on_message(message):
 	print(message.content, message.author)
 	if message.author == client.user:
 		return
+
+	await detect_violations(message, client)
+
+	await detect_new_ep(message, client)
+
+	await detect_cross_channel(message)
+				
+	await detect_lab_leak(message)
 	
-	# NOTE: to install discord.py 2.0, use 
-	# pip install git+https://github.com/Rapptz/discord.py
-	if any(role.name == 'Organizer' or role.name == 'Moderator' for role in message.author.roles): # whitelist moderator and organizer roles
-		pass
-	else:
-		print(message.type)
-		# rules: [rule lambda, message to send violator, hint]
-		contains_hyperlink = [lambda m: re.match(r".*https://.*", m, re.S), "contains hyperlink", ""]
-		content_too_long = [lambda m: len(m.split(" ")) > QUESTION_SUBMISSION_LIMIT, "content too long", ""]
-		does_not_contain_bold_text = [lambda m: not re.match(r".*\*\*.*\*\*.*", m, re.S), "does not contain bold text", ""]
-		does_not_contain_hyperlink = [lambda m: not re.match(r".*https://.*", m, re.S), "does not contain hyperlink", ""]
+	await detect_wordcloud(message)
 
-		pinned_rules_message_link = "https://discord.com/channels/726864220838297610/755811907948118179/983562041786789898"
-
-		# [list of rule, channel id using these rules]
-		all_rules = [
-			[[contains_hyperlink, content_too_long], question_submission_channel_id],
-		]
-
-		did_violate = False
-		violations = []
-		hints = []
-		for rules, rule_channel_id in all_rules:
-			if message.channel.id == rule_channel_id:
-				for rule_lambda, violation_message, hint in rules:
-					if rule_lambda(message.content):
-						violations.append(violation_message)
-						hints.append(hint)
-						did_violate = True
-		if did_violate:
-			await message.delete()
-			question_chat_channel = await client.fetch_channel(question_chat_channel_id)
-			bot_noise = random.choice(["*mechanical wail~~*", "Booooop", "Boink", "BeepBeep", "Blarmo!"])
-			await question_chat_channel.send(
-				"%s <@!%s>! Your message in <#%s> was deleted for the following violations:\n\n" % (bot_noise, message.author.id, message.channel.id) + 
-				"\n".join(v + "\n" + h for v, h in zip(("**"+v+"**" for v in violations), ("*"+h+"*" if h else "" for h in hints))) +
-				"\n\nPlease check the pinned rules: " + pinned_rules_message_link +
-				"\n\nPlease resubmit your entry!" +
-				"\n\nHere is your original entry:\n\n" +
-				"```" + 
-				message.content +
-				"```" 
-			)
-
-	if message.author.id == 268478587651358721: # check if MonitoRSS posted a new livestream episode
-		match = re.match(r".*Bret and Heather (.*) DarkHorse Podcast Livestream.*(https\:\/\/odysee\.com\/.*)", message.content, re.S)
-		print("MATCH: " + match[0])
-		if match:
-			livestream, livestream_link = match[1], match[2]
-			print("LINK: " + livestream_link)
-			livestream_number = int("".join(e for e in livestream if e.isnumeric()))
-			episode_name = "episode-%s" % livestream_number
-			channel = discord.utils.get(client.get_all_channels(), name=episode_name)
-			darkhorse_podcast_category_id = 833086830521483324
-			category = await client.fetch_channel(darkhorse_podcast_category_id)
-			if not channel:
-				# if channel isn't created yet, create new discussion channel, post livestream link, then pin livestream link
-				new_channel = await message.guild.create_text_channel(episode_name, category=category)
-				print("CREATE CHANNEL: ", new_channel)
-				message = await new_channel.send(livestream_link)
-				print(message)
-				await message.pin(reason="livestream link")
-
-	match = re.match(r"https://discord(app)?\.com/channels/(\d+)/(\d+)/(\d+)", message.content)
-	if match:
-		guild_id, channel_id, message_id = match[2], match[3], match[4]
-		if (int(channel_id), message.channel.id) in reference_referrer_pairs:
-			print("detected cross channel reference")
-			ref_channel = await client.fetch_channel(channel_id)
-			ref_msg = await ref_channel.fetch_message(message_id)
-			if ref_msg.author.id != message.author.id:
-				msg = "<@!%s> you have been summoned by <@!%s> " % (ref_msg.author.id, message.author.id)
-				await message.channel.send(msg)
-
-	match = re.match(r".*lab leak theory.*", message.content.lower())
-	if match:
-		print("detected theory reference")
-		msg = "<@!%s> do you mean lab leak hypothesis?" % (message.author.id)
-		await message.channel.send(msg)
-
-	if message.content.startswith("!wordcloud"):
-		try:
-			channel = await client.fetch_channel(message.channel.id)
-			print("generating wordcloud for channel %s" % message.channel.name)
-			match = re.match(r"!wordcloud (.*)", message.content.lower())
-			if match:
-				text = match[1]
-				parser = argparse.ArgumentParser(description='Process wordcloud arguments.')
-				parser.add_argument('--limit', type=int)
-				args = vars(parser.parse_args(shlex.split(text)))
-				print("wordcloud args: ", args)
-				await generate_wordcloud_for_channel(channel, args["limit"])
-			else:
-				await generate_wordcloud_for_channel(channel)
-		except Exception as e:
-			print("Exception: ", e)
-
-	match = re.match(r"!name (.*)", message.content.lower())
-	if match:
-		name = match[1]
-		print("detected channel name change")
-		msg = "changing channel name <#%s> -> %s" % (message.channel.id, name)
-		await message.channel.send(msg)
-		await message.channel.edit(name=name)
-		msg = "channel name changed to %s" % (message.channel.name)
-		await message.channel.send(msg)
-
-	match = re.match(r"!brian (.*)", message.content.lower())
-	if match:
-		text = match[1]
-		print("detected brian, %s" % text)
-		brian_text = "@".join(text.split(" "))
-		print("text: ", brian_text)
-		await message.channel.send(brian_text)
-
-	match = re.match(r"!couple (.*)", message.content.lower())
-	if match:
-		try:
-			text = match[1]
-			print("detected couple, %s" % text)
-
-			parser = argparse.ArgumentParser(description='Process meme arguments.')
-			parser.add_argument('--man_profile_id', type=int)
-			parser.add_argument('--woman_profile_id', type=int)
-			parser.add_argument('--man_text')
-			parser.add_argument('--woman_text')
-			parser.add_argument('text', nargs='?', default="")
-			args = vars(parser.parse_args(shlex.split(text)))
-			print("couple args: ", args)
-			
-			DEFAULT_TEXT0 = "i bet he's thinking about other women"
-			CIN_URL = "https://i.ibb.co/P1NGNqz/cin.png"
-			man_profile_id = args["man_profile_id"]
-			woman_profile_id = args["woman_profile_id"]
-			text = args["text"]
-			man_text = args["man_text"] if args["man_text"] else text
-			woman_text = args["woman_text"] if args["woman_text"] else DEFAULT_TEXT0
+	await detect_name(message)
 		
-			if man_profile_id:
-				# special cin case
-				if man_profile_id == 456226577798135808:
-					img_url = CIN_URL
-				else:
-					profile = await client.fetch_user(man_profile_id)
-					img_url = profile.avatar.url.split("?")[0] + "?size=80"
-				print(img_url)
-				img_data = requests.get(img_url).content
+	await detect_brian(message)
 
-				with open('man-profile.jpg', 'wb') as handler:
-					handler.write(img_data)
-
-			if woman_profile_id:
-				# special cin case
-				if woman_profile_id == 456226577798135808:
-					img_url = CIN_URL
-				else:
-					profile = await client.fetch_user(woman_profile_id)
-					img_url = profile.avatar.url.split("?")[0] + "?size=80"
-				print(img_url)
-				img_data = requests.get(img_url).content
-
-				with open('woman-profile.jpg', 'wb') as handler:
-					handler.write(img_data)
-
-			generate_meme(text0=woman_text, text1=man_text, replace_man_profile=True if man_profile_id else False, replace_woman_profile=True if woman_profile_id else False)
-
-			with open('meme.jpg', 'rb') as fp:
-				await message.channel.send(file=discord.File(fp, 'meme.jpg'))
-		
-		except Exception as e:		
-			print("Error: ", e)
-
-async def generate_wordcloud_for_channel(channel):	
-	messages = []
-
-	async for message in channel.history(limit=200):
-		if message.author != client.user:
-			messages.append(message.content)
-
-	text = "".join(messages)
-	wordcloud = generate_wordcloud(text)
-	wordcloud.to_file("wordcloud.jpg")
-	with open('wordcloud.jpg', 'rb') as fp:
-		await channel.send(file=discord.File(fp, 'wordcloud.jpg'))
-
-async def archive_channel_to_archive(channel_id, archive_id):
-	old_channel = await client.fetch_channel(channel_id)
-	archive_channel = await client.fetch_channel(archive_id)
-	print("ARCHIVING CHANNEL: " + old_channel.name)
-	await old_channel.edit(category=archive_channel, sync_permissions=True) # requires Manage Channel + Manage Permissions permissions
-
-async def archive_old_podcasts():
-	# archive old channels in episode discussions category
-	category_id = 833086830521483324 # darkhorse podcast category id
-	archive_id = 977024766387028008 # podcast archives category
-	episode_discussions_channel = await client.fetch_channel(category_id)
-
-	for channel in episode_discussions_channel.channels:
-		if channel.name.startswith("episode-") and (datetime.now(pytz.utc)-channel.created_at).days > 13 and not channel.name == "episode-discussions":
-			await archive_channel_to_archive(channel.id, archive_id)
-
-async def update_channel_names():
-	current_time = datetime.now(pytz.utc)
-	current_day = datetime.today().weekday()
-	print("current time is %s, weekday is %s" % (current_time.strftime("%H:%M:%S"), current_day))
-	reset_channel_ids_and_names = [
-		["833087132414771310", "Lounge One"],
-		["732987976317009922", "lounge-one-text"],
-		["833087155546620005", "Lounge Two"],
-		["804431468662358057", "lounge-two-text"],
-		["838114202979532830", "Seminar Room"],
-	]
-	if current_time.hour == 5: # reset channel names each day at midnight
-		for id, name in reset_channel_ids_and_names:
-			channel = await client.fetch_channel(id)
-			await channel.edit(name=name)
-		print("updated lounge channel names at midnight")
-	# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
-	# 	await lounge_two_channel.edit(name="Campfire Karaoke")
-	# 	print("updated Lounge Two channel name to Campfire Karaoke")
-
-async def check_time():
-	print("running check_time")
-	# await client.wait_until_ready()
-	print("ready check_time")
-	while not client.is_closed():
-		try:
-			print("scheduling check_time")
-
-			await update_channel_names()
-
-			await archive_old_podcasts()
-
-			await asyncio.sleep(60)
-		except Exception as e:
-			print(e)
-			await asyncio.sleep(60)
-	print("done check_time")
-
-def wait():
-	print("execute wait")
-	asyncio.run_coroutine_threadsafe(check_time(), asyncio.new_event_loop())
-
-# client.loop.create_task(check_time())
-
-def between_callback():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    loop.run_until_complete(check_time())
-    loop.close()
+	await detect_couple(message, client)
 
 async def main():
 	await client.login(token=TOKEN)
 
 	# do other async things	
-	thread = threading.Thread(target=between_callback)
-	thread.start()
+	do_background_tasks(client)
 
     # start the client
 	async with client:
@@ -309,5 +74,3 @@ async def main():
 		await client.start(TOKEN)
 
 asyncio.run(main())
-
-# client.run(TOKEN)
