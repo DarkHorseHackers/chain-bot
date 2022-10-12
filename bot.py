@@ -14,6 +14,7 @@ import shlex
 import shutil
 import discord
 from dotenv import load_dotenv
+from functions.detect_chupa import detect_chupa
 
 from functions.detect_lab_leak import detect_lab_leak
 from functions.detect_cross_channel import detect_cross_channel
@@ -59,6 +60,8 @@ async def on_message(message):
 	await detect_name(message)
 		
 	await detect_brian(message)
+		
+	await detect_chupa(message)
 
 	await detect_couple(message, client)
 
