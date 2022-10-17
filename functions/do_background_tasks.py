@@ -43,6 +43,17 @@ async def update_channel_names(client):
 	# if current_day == 6 and ((current_time.hour == 19 and current_time.minute >= 30) or (20 <= current_time.hour < 22) or (current_time.hour == 22 and current_time.minute <= 15)): # between 4:30 and 7:15 PST
 	# 	await lounge_two_channel.edit(name="Campfire Karaoke")
 	# 	print("updated Lounge Two channel name to Campfire Karaoke")
+	
+async def remove_extraneous_channels(client):
+	all_channels = client.get_all_channels()
+	# reduce all channels to only channels in the Free Thought Lounge
+	free_thought_channels = filter(lambda channel: channel.category == "833087021324697631", all_channels)
+	# if there are more than four channels in the Free Thought Lounge, iterate over all channels in the Free Thought Lounge
+	if len(free_thought_channels) > 4
+		for channel in free_thought_channels
+			# if the channel is not Lounge One, Lounge Two, lounge-one-text, or lounge-two-text, delete the channel
+			if channel.id != "833087132414771310" and channel.id != "732987976317009922" and channel.id != "833087155546620005" and channel.id != "804431468662358057"
+				channel.delete("identified as extraneous channel in the Free Thought Lounge")
 
 async def check_time(client):
 	print("running check_time")
@@ -55,6 +66,8 @@ async def check_time(client):
 			await update_channel_names(client)
 
 			await archive_old_podcasts(client)
+			
+			await remove_extraneous_channels(client)
 
 			await asyncio.sleep(60)
 		except Exception as e:
