@@ -7,6 +7,7 @@ darkhorse_podcast_category_id = 833086830521483324
 
 async def detect_new_ep(message: Message, client: Client):
 	if message.author.id == monitoRSS_id: # check if MonitoRSS posted a new livestream episode
+		return None # never execute the below code creating new channels. This line can be removed to restore channel creation functionality.
 		match = re.match(r".*Bret and Heather (.*) DarkHorse Podcast Livestream.*(https\:\/\/odysee\.com\/.*)", message.content, re.S)
 		print("MATCH: " + match[0])
 		if match:
