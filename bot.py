@@ -6,8 +6,6 @@ import asyncio
 import time
 import sched
 from datetime import datetime
-from pytz import timezone
-import pytz
 import requests
 import argparse
 import shlex
