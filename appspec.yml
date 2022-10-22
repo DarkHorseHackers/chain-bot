@@ -3,6 +3,7 @@ os: linux
 files:
   - source: /
     destination: /home/ec2-user/chain-bot
+file_exists_behavior: OVERWRITE
 hooks:
   Install:
     - location: scripts/install_dependencies.sh
