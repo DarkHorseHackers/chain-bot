@@ -1,2 +1,2 @@
 #!/bin/bash
-python bot.py
+python /home/ec2-user/chain-bot/bot.py

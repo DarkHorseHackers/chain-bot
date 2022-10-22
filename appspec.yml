@@ -4,10 +4,11 @@ files:
   - source: /
     destination: /home/ec2-user/chain-bot
 hooks:
-  BeforeInstall:
+  Install:
     - location: scripts/install_dependencies.sh
       timeout: 300
       runas: root
+  ApplicationStart:
     - location: scripts/start_bot.sh
       timeout: 300
       runas: root
