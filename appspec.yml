@@ -5,7 +5,7 @@ files:
     destination: /home/ec2-user/chain-bot
 file_exists_behavior: OVERWRITE
 hooks:
-  Install:
+  BeforeInstall:
     - location: scripts/install_dependencies.sh
       timeout: 300
       runas: root
