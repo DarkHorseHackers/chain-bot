@@ -13,7 +13,8 @@ async def detect_chupa(message: Message):
                 parser = argparse.ArgumentParser(description='Process chupa arguments.')
                 parser.add_argument('--time', type=int)
                 parser.add_argument('text', nargs=argparse.REMAINDER, default="")
-                args = vars(parser.parse_args(text.split(" ")))
+                args, _unknown = parser.parse_known_args(text.split(" "))
+                args = vars(args)
                 print("chupa args: ", args)
                 if args["time"]:
                     await asyncio.sleep(args["time"])

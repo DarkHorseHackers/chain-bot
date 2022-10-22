@@ -15,7 +15,8 @@ async def detect_wordcloud(message: Message):
 				text = match[1]
 				parser = argparse.ArgumentParser(description='Process wordcloud arguments.')
 				parser.add_argument('--limit', type=int)
-				args = vars(parser.parse_args(shlex.split(text)))
+				args, _unknown = parser.parse_known_args(shlex.split(text))
+				args = vars(args)
 				print("wordcloud args: ", args)
 				await generate_wordcloud_for_channel(channel, args["limit"])
 			else:

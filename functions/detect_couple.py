@@ -19,7 +19,8 @@ async def detect_couple(message: Message, client: Client):
 			parser.add_argument('--man_text')
 			parser.add_argument('--woman_text')
 			parser.add_argument('text', nargs='?', default="")
-			args = vars(parser.parse_args(shlex.split(text)))
+			args, _unknown = parser.parse_known_args(shlex.split(text))
+			args = vars(args)
 			print("couple args: ", args)
 			
 			DEFAULT_TEXT0 = "i bet he's thinking about other women"
