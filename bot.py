@@ -1,15 +1,5 @@
 import os
-import random
-import re
-import threading
 import asyncio
-import time
-import sched
-from datetime import datetime
-import requests
-import argparse
-import shlex
-import shutil
 import discord
 from dotenv import load_dotenv
 from functions.detect_chupa import detect_chupa
