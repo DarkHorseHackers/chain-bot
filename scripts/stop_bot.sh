@@ -11,5 +11,5 @@ elif [ $pkillexitstatus -eq 2]; then
 elif [ $pkillexitstatus -eq 3]; then
     echo "pkill: fatal error"
 else
-    echo UNEXPECTED
+    echo "pkill: UNEXPECTED $pkillexitstatus"
 fi
