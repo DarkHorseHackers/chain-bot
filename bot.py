@@ -13,6 +13,7 @@ from functions.detect_name import detect_name
 from functions.detect_violations import detect_violations
 from functions.detect_new_ep import detect_new_ep
 from functions.do_background_tasks import do_background_tasks
+from functions.gnome_the_gnome import gnome_the_gnome
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -52,6 +53,8 @@ async def on_message(message):
 	await detect_chupa(message)
 
 	await detect_couple(message, client)
+
+	await gnome_the_gnome(message)
 
 async def main():
 	await client.login(token=TOKEN)
