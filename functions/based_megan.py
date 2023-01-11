@@ -6,5 +6,5 @@ BASED_EMOJI = "<:DH_Based:1062783035029864570>"
 
 async def based_megan(message: Message):
 	if message.author.id == MEGAN_ID:
-		if message.channel.id == LATE_NIGHT_PUB_ID:
-			await message.add_reaction(BASED_EMOJI)
+	    await message.add_reaction(BASED_EMOJI)
+#		if message.channel.id == LATE_NIGHT_PUB_ID:
