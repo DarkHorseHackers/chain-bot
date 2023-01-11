@@ -24,7 +24,7 @@ intents.message_content = True
 intents.guilds = True
 client = discord.Client(intents=intents)
 
-# NOTE: to install discord.py 2.0, use 
+# NOTE: to install discord.py 2.0, use
 # pip install git+https://github.com/Rapptz/discord.py
 
 @client.event
@@ -42,27 +42,28 @@ async def on_message(message):
 	await detect_new_ep(message, client)
 
 	await detect_cross_channel(message)
-				
+
 	await detect_lab_leak(message)
-	
+
 	await detect_wordcloud(message)
 
 	await detect_name(message)
-		
+
 	await detect_brian(message)
-		
+
 	await detect_chupa(message)
 
-	await detect_couple(message, client)
+	# await detect_couple(message, client)
 
 	await gnome_the_gnome(message)
-	
+
 	await detect_twitter(message)
 
 async def main():
+	print(TOKEN)
 	await client.login(token=TOKEN)
 
-	# do other async things	
+	# do other async things
 	do_background_tasks(client)
 
     # start the client

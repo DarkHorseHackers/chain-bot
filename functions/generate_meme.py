@@ -8,8 +8,8 @@ load_dotenv()
 
 url = "https://api.imgflip.com/caption_image"
 
-imgflip_username = os.getenv('IMGFLIP_USERNAME')
-imgflip_password = os.getenv('IMGFLIP_PASSWORD')
+imgflip_username = os.getenv('IMGFLIP_USERNAME') if os.getenv('IMGFLIP_USERNAME') != None else 'username'
+imgflip_password = os.getenv('IMGFLIP_PASSWORD') if os.getenv('IMGFLIP_PASSWORD') != None else 'password'
 
 payload = 'template_id=130331290&username=' + imgflip_username + '&password=' + imgflip_password
 headers = {
@@ -27,7 +27,7 @@ def generate_meme(text1: str, text0: str, replace_man_profile: bool = False, rep
 
         img_data = requests.get(img_url).content
         with open('meme.jpg', 'wb') as handler:
-            handler.write(img_data)    
+            handler.write(img_data)
 
         background = Image.open("meme.jpg")
 

@@ -1,2 +1,7 @@
 .env
 .pytest_cache
+
+chain-bot-env/
+chain-bot-env/*
+
+functions/__pycache__/*
