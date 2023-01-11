@@ -14,6 +14,7 @@ from functions.detect_violations import detect_violations
 from functions.detect_new_ep import detect_new_ep
 from functions.do_background_tasks import do_background_tasks
 from functions.gnome_the_gnome import gnome_the_gnome
+from functions.based_megan import based_megan
 from functions.detect_twitter import detect_twitter
 
 load_dotenv()
@@ -24,7 +25,7 @@ intents.message_content = True
 intents.guilds = True
 client = discord.Client(intents=intents)
 
-# NOTE: to install discord.py 2.0, use 
+# NOTE: to install discord.py 2.0, use
 # pip install git+https://github.com/Rapptz/discord.py
 
 @client.event
@@ -42,27 +43,29 @@ async def on_message(message):
 	await detect_new_ep(message, client)
 
 	await detect_cross_channel(message)
-				
+
 	await detect_lab_leak(message)
-	
+
 	await detect_wordcloud(message)
 
 	await detect_name(message)
-		
+
 	await detect_brian(message)
-		
+
 	await detect_chupa(message)
 
 	await detect_couple(message, client)
 
 	await gnome_the_gnome(message)
-	
+
+	await based_megan(message)
+
 	await detect_twitter(message)
 
 async def main():
 	await client.login(token=TOKEN)
 
-	# do other async things	
+	# do other async things
 	do_background_tasks(client)
 
     # start the client
