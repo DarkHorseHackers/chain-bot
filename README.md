@@ -17,14 +17,14 @@ cd Python-3.8.16/
 sudo ./configure --enable-optimizations
 sudo make install
 
-export DISCORD_TOKEN=MTA1NjQyNjM3NTA2MzU0Nzk1NA.GE2Yxv.FpWlQWLa9eUyyGNVM_44Ylnt2SMEkw62fSj5_c
+export DISCORD_TOKEN=
 
 python3.8 -m venv chain-bot-env --system-site-packages
 source chain-bot-env/bin/activate
 pip3.8 install -r requirements.txt --user
 
 tail -f /proc/<pid>/fd/1
-tail -f /proc/5220/fd/1
+tail -f /proc/9436/fd/1
 
 deactivate
 
