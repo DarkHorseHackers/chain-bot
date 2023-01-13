@@ -3,7 +3,7 @@ import asyncio
 import discord
 from dotenv import load_dotenv
 from functions.detect_chupa import detect_chupa
-
+from functions.do_not_ping_kc import do_not_ping_kc
 from functions.detect_lab_leak import detect_lab_leak
 from functions.detect_cross_channel import detect_cross_channel
 from functions.detect_wordcloud import detect_wordcloud
@@ -54,6 +54,8 @@ async def on_message(message):
 	await detect_chupa(message)
 
 	# await detect_couple(message, client)
+
+	await do_not_ping_kc(message)
 
 	await gnome_the_gnome(message)
 
