@@ -60,7 +60,7 @@ async def on_message(message):
 
 	await based_megan(message)
 
-	await detect_twitter(message)
+	# await detect_twitter(message)
 
 async def main():
 	await client.login(token=TOKEN)
