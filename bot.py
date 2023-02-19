@@ -3,6 +3,7 @@ import asyncio
 import discord
 from dotenv import load_dotenv
 from functions.detect_chupa import detect_chupa
+from functions.detect_dm import detect_dm
 
 from functions.detect_lab_leak import detect_lab_leak
 from functions.detect_cross_channel import detect_cross_channel
@@ -37,6 +38,8 @@ async def on_message(message):
 	print(message.content, message.author)
 	if message.author == client.user:
 		return
+
+	await detect_dm(message, client)
 
 	await detect_violations(message, client)
 
