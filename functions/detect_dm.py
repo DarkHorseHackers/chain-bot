@@ -7,7 +7,6 @@ DARK_HORSE_DISCORD_GUILD_ID = 726864220838297610
 TEST_SERVER_GUILD_ID = 850886002275778612
 
 async def detect_dm(message: Message, client: Client):
-    print("detect dm")
     print(message, message.author, client.user)
     if message.author == client.user:
         return
