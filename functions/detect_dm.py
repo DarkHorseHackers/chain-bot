@@ -1,7 +1,7 @@
 import re
 import discord
 from discord import Message, Client
-from gnome_the_gnome import GNOME_UP_EMOJI, GNOME_DOWN_EMOJI
+from functions.gnome_the_gnome import GNOME_UP_EMOJI, GNOME_DOWN_EMOJI
 
 DARK_HORSE_DISCORD_GUILD_ID = 726864220838297610
 TEST_SERVER_GUILD_ID = 850886002275778612
