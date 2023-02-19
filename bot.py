@@ -56,7 +56,7 @@ async def on_message(message):
 
 	await detect_couple(message, client)
 
-	await gnome_the_gnome(message)
+	# await gnome_the_gnome(message)
 
 	await based_megan(message)
 
